@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const Dishes = require('./models/dishes');
 
 const url = 'mongodb://confusion_admin:Confusion2018@ds033699.mlab.com:33699/confusion';
-const connect = mongoose.connect(url);
+const connect = mongoose.connect(url,{ useNewUrlParser: true });
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
