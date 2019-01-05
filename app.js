@@ -1,16 +1,15 @@
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const logger = require('morgan');
 
 const mongoose = require('mongoose');
-const Dishes = require('./models/dishes');
 
 const url = 'mongodb://confusion_admin:Confusion2018@ds033699.mlab.com:33699/confusion';
 const connect = mongoose.connect(url,{ useNewUrlParser: true });
+mongoose.set('useCreateIndex', true);
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -35,6 +34,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(session({
   name: 'session-id',
   secret: '12345-67890-09876-54321',
+  resave: false,
   saveUninitialized: false,
   store: new FileStore()
 }));
