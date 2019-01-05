@@ -45,7 +45,7 @@ app.use('/users', usersRouter);
 function auth(req,res,next){
   
   if(!req.session.user){
-    let err = new Error('You are not authenticated!');
+    const err = new Error('You are not authenticated!');
     err.status = 403;
     next(err);
   }
@@ -53,7 +53,7 @@ function auth(req,res,next){
     if(req.session.user === 'authenticated'){
       next();
     }else{
-      let err = new Error('You are not authenticated!');
+      const err = new Error('You are not authenticated!');
       err.status = 403;
       next(err);
     }
