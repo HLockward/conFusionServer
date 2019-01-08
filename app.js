@@ -6,10 +6,11 @@ const FileStore = require('session-file-store')(session);
 const logger = require('morgan');
 const passport = require('passport');
 const authenticate = require('./authenticate');
+const config = require('./config');
 
 const mongoose = require('mongoose');
 
-const url = 'mongodb://confusion_admin:Confusion2018@ds033699.mlab.com:33699/confusion';
+const url = config.mongoUrl;
 const connect = mongoose.connect(url,{ useNewUrlParser: true });
 mongoose.set('useCreateIndex', true);
 
@@ -46,21 +47,6 @@ app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
-function auth(req,res,next){
-  
-  if(!req.user){
-    const err = new Error('You are not authenticated!');
-    res.setHeader('WWW-Authenticate', 'Basic');
-    err.status = 401;
-    next(err);
-  }
-  else{
-    next();
-  }  
-}
-
-app.use(auth);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
