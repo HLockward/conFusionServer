@@ -5,7 +5,6 @@ const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const logger = require('morgan');
 const passport = require('passport');
-const authenticate = require('./authenticate');
 const config = require('./config');
 
 const mongoose = require('mongoose');
@@ -21,6 +20,7 @@ const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
 const uploadRouter = require('./routes/uploadRouter');
 const favoriteRouter = require('./routes/favoriteRoute');
+const feedbackRouter = require('./routes/feedbackRoute');
 
 const app = express();
 
@@ -66,6 +66,7 @@ app.use('/promotions', promoRouter);
 app.use('/leaders', leaderRouter);
 app.use('/imageUpload', uploadRouter);
 app.use('/favorites', favoriteRouter);
+app.use('/feedbacks', feedbackRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
