@@ -10,8 +10,8 @@ router.use(bodyParser.json());
 
 
 /* GET users listing. */
+router.options('*', cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
 router.route('/')
-.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
 .get(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
   Users.find({})
   .then((user) => {
@@ -51,12 +51,53 @@ router.post('/signup',cors.corsWithOptions,  (req, res, next) => {
     }
   });
 });
-
+/*
 router.post('/login',cors.corsWithOptions,  passport.authenticate('local'),(req, res) =>{
   const token = authenticate.getToken({_id: req.user._id});
+  const user = {
+    username : req.user.username,
+    firstname : req.user.firstname,
+    lastname : req.user.lastname,
+    token : token
+  };
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
-  res.json({success: true, token: token, status: 'You are successfully logged in!'});
+  res.json({success: true, user: user, status: 'You are successfully logged in!'});
+});*/
+
+router.post('/login', cors.corsWithOptions, (req, res, next) => {
+
+  passport.authenticate('local', (err, user, info) => {
+    if (err){
+      return next(err);
+    }
+
+    if (!user) {
+      res.statusCode = 401;
+      res.setHeader('Content-Type', 'application/json');
+      res.json({success: false, status: 'Login Unsuccessful!', err: info});
+    }
+    else{
+      req.logIn(user, (err) => {
+        if (err) {
+          res.statusCode = 401;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({success: false, status: 'Login Unsuccessful!', err: 'Could not log in user!'});          
+        }else{
+          const token = authenticate.getToken({_id: req.user._id});
+          const user = {
+            username : req.user.username,
+            firstname : req.user.firstname,
+            lastname : req.user.lastname,
+            token : token
+          };
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({success: true, status: 'Login Successful!', user: user});
+        }
+      }); 
+    }
+  }) (req, res, next);
 });
 
 router.get('/logout', (req, res) => {

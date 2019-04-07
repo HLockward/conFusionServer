@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const passport = require('passport');
-
+require('dotenv').config();
 const mongoose = require('mongoose');
 
 const url = process.env.MONGO_URL;
