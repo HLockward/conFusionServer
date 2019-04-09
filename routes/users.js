@@ -51,19 +51,6 @@ router.post('/signup',cors.corsWithOptions,  (req, res, next) => {
     }
   });
 });
-/*
-router.post('/login',cors.corsWithOptions,  passport.authenticate('local'),(req, res) =>{
-  const token = authenticate.getToken({_id: req.user._id});
-  const user = {
-    username : req.user.username,
-    firstname : req.user.firstname,
-    lastname : req.user.lastname,
-    token : token
-  };
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'application/json');
-  res.json({success: true, user: user, status: 'You are successfully logged in!'});
-});*/
 
 router.post('/login', cors.corsWithOptions, (req, res, next) => {
 
@@ -98,6 +85,25 @@ router.post('/login', cors.corsWithOptions, (req, res, next) => {
       }); 
     }
   }) (req, res, next);
+});
+
+router.get('/checkJWTToken', cors.corsWithOptions, (req, res) => {
+  passport.authenticate('jwt', {session: false}, (err, user, info) => {
+    if (err)
+      return next(err);
+    
+    if (!user) {
+      res.statusCode = 401;
+      res.setHeader('Content-Type', 'application/json');
+      return res.json({status: 'JWT invalid!', success: false, err: info});
+    }
+    else {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      return res.json({status: 'JWT valid!', success: true, user: user});
+
+    }
+  }) (req, res);
 });
 
 router.get('/logout', (req, res) => {
