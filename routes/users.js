@@ -42,11 +42,31 @@ router.post('/signup',cors.corsWithOptions,  (req, res, next) => {
           res.setHeader('Content-Type', 'application/json');
           res.json({err: err});
         }
-        passport.authenticate('local')(req, res, () =>{
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'application/json');
-          res.json({success: true, status: 'Registration Successful!'});
-        });
+        passport.authenticate('local', (err, user, info) => {
+          if (err){
+            return next(err);
+          }
+          else{
+            req.logIn(user, (err) => {
+              if (err) {
+                res.statusCode = 401;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({success: false, status: 'Login Unsuccessful!', err: 'Could not log in user!'});          
+              }else{
+                const token = authenticate.getToken({_id: req.user._id});
+                const user = {
+                  username : req.user.username,
+                  firstname : req.user.firstname,
+                  lastname : req.user.lastname,
+                  token : token
+                };
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({success: true, status: 'Login Successful!', user: user});
+              }
+            }); 
+          }
+        }) (req, res, next);
       }); 
     }
   });
@@ -106,17 +126,8 @@ router.get('/checkJWTToken', cors.corsWithOptions, (req, res) => {
   }) (req, res);
 });
 
-router.get('/logout', (req, res) => {
-  if (req.session) {
-    req.session.destroy();
-    res.clearCookie('session-id');
-    res.redirect('/');
-  }
-  else {
-    var err = new Error('You are not logged in!');
-    err.status = 403;
-    next(err);
-  }
+router.get('/logout',cors.cors, (req, res, next) => {
+    res.json({success: true, status: 'Logout Successful!'});
 });
 
 router.get('/facebook/token', passport.authenticate('facebook-token'), (req, res) =>{
